@@ -28,7 +28,7 @@ ChatToPR is an AI-powered developer tool that eliminates the manual overhead bet
 
 ## Live Demo
 
-> **[chat-to-pr.vercel.app](https://chat-to-pr.vercel.app)** — no login or setup required.
+> **[chat-to-pr.vercel.app](https://chat-to-pr-two.vercel.app)** — no login or setup required.
 
 Click **Trigger IBM Bob Agent** on the demo page. Within seconds, a real `triage/INC-<id>` branch is created and a Pull Request is opened on the public sandbox repository — open [`TeyYongZhun/ChatToPR_sandbox`](https://github.com/TeyYongZhun/ChatToPR_sandbox/pulls) in a new tab to see it live.
 
