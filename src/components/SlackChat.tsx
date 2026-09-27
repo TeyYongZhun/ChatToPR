@@ -79,8 +79,8 @@ const THREAD: Message[] = [
 const AGENT_STEPS_TEMPLATE: AgentStep[] = [
   { id: "s1", label: "Reading thread context…", status: "pending" },
   { id: "s2", label: "Identifying root cause & fix", status: "pending" },
-  { id: "s3", label: "Generating patch for OrderRepository.findAll()", status: "pending" },
-  { id: "s4", label: "Writing Jest regression test", status: "pending" },
+  { id: "s3", label: "Building incident record (timeline, root cause, refs)", status: "pending" },
+  { id: "s4", label: "Committing triage/INC-*.md to new branch", status: "pending" },
   { id: "s5", label: "Opening GitHub Pull Request", status: "pending" },
 ];
 
@@ -174,7 +174,7 @@ export default function SlackChat() {
     });
 
     try {
-      const thread = THREAD.map((m) => ({ user: m.author, text: m.text, ts: m.id }));
+      const thread = THREAD.map((m) => ({ user: m.author, text: m.text, ts: m.timestamp }));
       const res = await fetch("/api/triage", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -232,7 +232,7 @@ export default function SlackChat() {
         {agentState === "idle" && (
           <div className="flex items-center justify-between">
             <p className="text-xs text-gray-500 max-w-sm">
-              IBM Bob Agent will read this thread, generate a hotfix patch, and open a pull request automatically.
+              IBM Bob Agent will read this thread, create a structured incident record, and open a pull request automatically.
             </p>
             <button
               onClick={triggerAgent}
