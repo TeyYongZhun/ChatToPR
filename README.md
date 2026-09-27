@@ -30,6 +30,39 @@ One button click. Real PR. No context switching.
 
 ---
 
+## System Workflow
+
+```mermaid
+flowchart TD
+    A([👤 Engineer]) -->|pastes incident thread| B[ChatToPR UI\nSlackChat.tsx]
+    B -->|clicks Trigger IBM Bob Agent| C[POST /api/triage\nNext.js Serverless Route]
+
+    C --> D[Step 1: Ingest Thread\nParse messages · author · timestamp · text]
+    D --> E[Step 2: IBM Bob AI\nAnalyse root cause\nGenerate patch + regression test]
+    E --> F[Step 3: Resolve HEAD SHA\noctokit.repos.get + git.getRef]
+    F --> G[Step 4: Create Branch\ntriage/timestamp]
+    G --> H[Step 5: Commit Patch\noctokit.repos.createOrUpdateFileContents]
+    H --> I[Step 6: Open Pull Request\noctokit.pulls.create]
+
+    I --> J([✅ PR ready for human review\ngithub.com/.../pull/N])
+
+    style A fill:#6b7280,color:#fff,stroke:none
+    style J fill:#16a34a,color:#fff,stroke:none
+    style E fill:#7c3aed,color:#fff,stroke:none
+    style I fill:#2563eb,color:#fff,stroke:none
+```
+
+| Step | What happens | Where in code |
+|---|---|---|
+| 1 | Thread messages POSTed as a JSON array | `src/components/SlackChat.tsx` |
+| 2 | IBM Bob reads thread, identifies root cause, writes patch | IBM Bob Agent Engine |
+| 3 | Resolve default branch HEAD SHA | `src/app/api/triage/route.ts` |
+| 4 | New `triage/<timestamp>` branch created | `src/app/api/triage/route.ts` |
+| 5 | Patch committed as base64 blob to new branch | `src/app/api/triage/route.ts` |
+| 6 | Pull Request opened against default branch | `src/app/api/triage/route.ts` |
+
+---
+
 ## Key Features
 
 - **One-click triage** — click "Trigger IBM Bob Agent" and watch the 5-step pipeline run live.
