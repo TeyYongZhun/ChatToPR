@@ -149,18 +149,20 @@ function AgentStepRow({ step }: { step: AgentStep }) {
 
 /* ─── Main component ─────────────────────────────────────────────────────── */
 export default function SlackChat() {
-  const [agentState, setAgentState] = useState<"idle" | "running" | "done">("idle");
+  const [agentState, setAgentState] = useState<"idle" | "running" | "done" | "error">("idle");
   const [steps, setSteps] = useState<AgentStep[]>(AGENT_STEPS_TEMPLATE.map((s) => ({ ...s })));
-  const [prUrl] = useState("https://github.com/acme/order-service/pull/314");
+  const [prUrl, setPrUrl] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  function triggerAgent() {
+  async function triggerAgent() {
     if (agentState !== "idle") return;
     setAgentState("running");
+    setErrorMsg(null);
+    setPrUrl(null);
 
+    // Animate steps optimistically while the real API call is in-flight.
     const delays = [800, 1800, 3200, 4600, 6000];
-
     delays.forEach((delay, index) => {
-      // Mark current step as running
       setTimeout(() => {
         setSteps((prev) =>
           prev.map((s, i) => ({
@@ -169,20 +171,36 @@ export default function SlackChat() {
           }))
         );
       }, delay);
-
-      // Mark current step as done shortly after
-      setTimeout(() => {
-        setSteps((prev) =>
-          prev.map((s, i) => ({
-            ...s,
-            status: i <= index ? "done" : "pending",
-          }))
-        );
-        if (index === delays.length - 1) {
-          setAgentState("done");
-        }
-      }, delay + 600);
     });
+
+    try {
+      const thread = THREAD.map((m) => ({ user: m.author, text: m.text, ts: m.id }));
+      const res = await fetch("/api/triage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ thread }),
+      });
+      const data = await res.json();
+
+      if (!res.ok || !data.ok) {
+        throw new Error(data.error ?? `HTTP ${res.status}`);
+      }
+
+      // Mark all steps done and surface the real PR URL.
+      setSteps((prev) => prev.map((s) => ({ ...s, status: "done" })));
+      setPrUrl(data.prUrl ?? null);
+      setAgentState("done");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setSteps((prev) =>
+        prev.map((s) => ({
+          ...s,
+          status: s.status === "running" || s.status === "pending" ? "error" : s.status,
+        }))
+      );
+      setErrorMsg(msg);
+      setAgentState("error");
+    }
   }
 
   return (
@@ -228,20 +246,28 @@ export default function SlackChat() {
           </div>
         )}
 
-        {(agentState === "running" || agentState === "done") && (
+        {(agentState === "running" || agentState === "done" || agentState === "error") && (
           <div className="space-y-1">
             <p className="text-xs font-semibold text-gray-600 mb-2 flex items-center gap-1.5">
               <span
                 className={`w-2 h-2 rounded-full ${
-                  agentState === "running" ? "bg-yellow-400 animate-pulse" : "bg-green-500"
+                  agentState === "running"
+                    ? "bg-yellow-400 animate-pulse"
+                    : agentState === "error"
+                    ? "bg-red-500"
+                    : "bg-green-500"
                 }`}
               />
-              {agentState === "running" ? "IBM Bob Agent is working…" : "IBM Bob Agent — done"}
+              {agentState === "running"
+                ? "IBM Bob Agent is working…"
+                : agentState === "error"
+                ? "IBM Bob Agent — failed"
+                : "IBM Bob Agent — done"}
             </p>
             {steps.map((step) => (
               <AgentStepRow key={step.id} step={step} />
             ))}
-            {agentState === "done" && (
+            {agentState === "done" && prUrl && (
               <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-md">
                 <p className="text-xs font-semibold text-green-800 mb-1">✅ Pull request opened successfully</p>
                 <a
@@ -252,6 +278,12 @@ export default function SlackChat() {
                 >
                   {prUrl}
                 </a>
+              </div>
+            )}
+            {agentState === "error" && errorMsg && (
+              <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-md">
+                <p className="text-xs font-semibold text-red-800 mb-1">❌ Agent encountered an error</p>
+                <p className="text-xs text-red-700 break-all">{errorMsg}</p>
               </div>
             )}
           </div>
