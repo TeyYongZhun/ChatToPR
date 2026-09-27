@@ -2,17 +2,78 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Slack-like scrollbar styling */
-::-webkit-scrollbar {
-  width: 8px;
+/* ── Google Font: Inter ── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+/* ── Scrollbar styling ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+
+/* ── Noise texture overlay ── */
+.noise-overlay {
+  position: relative;
 }
-::-webkit-scrollbar-track {
-  background: transparent;
+.noise-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  border-radius: inherit;
 }
-::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
+
+/* ── Gradient mesh background ── */
+.bg-mesh {
+  background-color: #0a0a0f;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 20% -10%, rgba(74, 21, 75, 0.35) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 110%, rgba(18, 100, 163, 0.2) 0%, transparent 60%);
 }
-::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+
+/* ── Glassmorphism card ── */
+.glass-card {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ── Gradient text ── */
+.gradient-text {
+  background: linear-gradient(135deg, #c084fc 0%, #818cf8 50%, #38bdf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Glow ring on demo window ── */
+.glow-ring {
+  box-shadow:
+    0 0 0 1px rgba(192, 132, 252, 0.2),
+    0 8px 32px rgba(0, 0, 0, 0.6),
+    0 0 80px rgba(74, 21, 75, 0.25);
+}
+
+/* ── Animated gradient badge ── */
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+.badge-shimmer {
+  background: linear-gradient(90deg, #4A154B 0%, #7c3aed 40%, #38bdf8 60%, #4A154B 100%);
+  background-size: 200% auto;
+  animation: shimmer 4s linear infinite;
+}
+
+/* ── Feature card hover lift ── */
+.feature-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(192, 132, 252, 0.25);
+  border-color: rgba(192, 132, 252, 0.3);
 }

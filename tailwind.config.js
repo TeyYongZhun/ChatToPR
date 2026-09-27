@@ -20,6 +20,7 @@ module.exports = {
       },
       fontFamily: {
         sans: [
+          "Inter",
           "Lato",
           "-apple-system",
           "BlinkMacSystemFont",
@@ -28,6 +29,11 @@ module.exports = {
           "Arial",
           "sans-serif",
         ],
+      },
+      backgroundOpacity: {
+        6: "0.06",
+        8: "0.08",
+        12: "0.12",
       },
     },
   },
