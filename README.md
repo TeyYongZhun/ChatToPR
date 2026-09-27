@@ -12,7 +12,7 @@
 [![Vercel](https://img.shields.io/badge/Deployed_on_Vercel-000000?style=flat-square&logo=vercel&logoColor=white)](https://vercel.com/)
 [![Octokit](https://img.shields.io/badge/GitHub_API_(Octokit)-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/octokit/rest.js)
 
-**[🚀 Live Demo](https://chat-to-pr.vercel.app)** &nbsp;·&nbsp; **[📦 Sandbox Repo](https://github.com/TeyYongZhun/ChatToPR_sandbox)** &nbsp;·&nbsp; **[🐛 Report an Issue](https://github.com/TeyYongZhun/ChatToPR/issues)**
+**[🚀 Live Demo](https://chat-to-pr-two.vercel.app)** &nbsp;·&nbsp; **[📦 Sandbox Repo](https://github.com/TeyYongZhun/ChatToPR_sandbox)** &nbsp;·&nbsp; **[🐛 Report an Issue](https://github.com/TeyYongZhun/ChatToPR/issues)**
 
 </div>
 
